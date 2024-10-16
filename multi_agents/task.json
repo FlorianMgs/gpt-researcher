@@ -1,18 +1,18 @@
 {
-  "query": "Is AI in a hype cycle?",
+  "query": "luffy keychain",
   "max_sections": 3,
   "publish_formats": {
-    "markdown": true,
-    "pdf": true,
-    "docx": true
+    "markdown": true
   },
   "include_human_feedback": false,
-  "follow_guidelines": false,
-  "model": "gpt-4o",
+  "follow_guidelines": true,
+  "model": "gpt-4o-mini",
   "guidelines": [
-    "The report MUST be written in APA format",
+    "The report MUST be written as an engaging, SEO optimized, long and detailed collection description for an ecommerce store.",
+    "The report MUST include long tail keywords related to the main topic",
     "Each sub section MUST include supporting sources using hyperlinks. If none exist, erase the sub section or rewrite it to be a part of the previous section",
-    "The report MUST be written in spanish"
+    "The report MUST be written in english",
+    "DO NOT name your headings with words such as 'Introduction', 'Conclusion', or 'References'. Instead, use more engaging and SEO-friendly headings incorporating long tail keywords"
   ],
   "verbose": true
 }

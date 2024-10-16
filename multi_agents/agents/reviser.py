@@ -71,4 +71,5 @@ You MUST return nothing but a JSON in the following format:
         return {
             "draft": revision.get("draft"),
             "revision_notes": revision.get("revision_notes"),
+            "count_revisions": draft_state.get("count_revisions", 0) + 1
         }

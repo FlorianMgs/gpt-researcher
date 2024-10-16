@@ -62,10 +62,11 @@ Guidelines: {guidelines}\nDraft: {draft_state.get("draft")}\n
 
     async def run(self, draft_state: dict):
         task = draft_state.get("task")
+        count_revisions = draft_state.get("count_revisions", 0)
         guidelines = task.get("guidelines")
         to_follow_guidelines = task.get("follow_guidelines")
         review = None
-        if to_follow_guidelines:
+        if to_follow_guidelines and count_revisions <= 3:
             print_agent_output(f"Reviewing draft...", agent="REVIEWER")
 
             if task.get("verbose"):
@@ -74,6 +75,9 @@ Guidelines: {guidelines}\nDraft: {draft_state.get("draft")}\n
                 )
 
             review = await self.review_draft(draft_state)
+            count_revisions += 1
+            print(f"Count revisions: {count_revisions}")
+            draft_state["count_revisions"] = count_revisions
         else:
             print_agent_output(f"Ignoring guidelines...", agent="REVIEWER")
         return {"review": review}

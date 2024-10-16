@@ -108,6 +108,7 @@ class ChiefEditorAgent:
         await self._log_research_start()
 
         config = {
+            "recursion_limit": 50,
             "configurable": {
                 "thread_id": task_id,
                 "thread_ts": datetime.datetime.utcnow()
