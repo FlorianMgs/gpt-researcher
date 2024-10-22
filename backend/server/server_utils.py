@@ -3,7 +3,7 @@ import os
 import re
 import time
 import shutil
-from typing import Dict, List
+from typing import Dict, List, Any
 from fastapi.responses import JSONResponse
 from gpt_researcher.document.document import DocumentLoader
 # Add this import
@@ -79,7 +79,7 @@ def update_environment_variables(config: Dict[str, str]):
 
 
 async def handle_file_upload(file, DOC_PATH: str) -> Dict[str, str]:
-    file_path = os.path.join(DOC_PATH, file.filename)
+    file_path = os.path.join(DOC_PATH, os.path.basename(file.filename))
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     print(f"File uploaded to {file_path}")
@@ -91,7 +91,7 @@ async def handle_file_upload(file, DOC_PATH: str) -> Dict[str, str]:
 
 
 async def handle_file_deletion(filename: str, DOC_PATH: str) -> JSONResponse:
-    file_path = os.path.join(DOC_PATH, filename)
+    file_path = os.path.join(DOC_PATH, os.path.basename(filename))
     if os.path.exists(file_path):
         os.remove(file_path)
         print(f"File deleted: {file_path}")
@@ -101,7 +101,7 @@ async def handle_file_deletion(filename: str, DOC_PATH: str) -> JSONResponse:
         return JSONResponse(status_code=404, content={"message": "File not found"})
 
 
-async def execute_multi_agents(manager) -> Dict[str, str]:
+async def execute_multi_agents(manager) -> Any:
     websocket = manager.active_connections[0] if manager.active_connections else None
     if websocket:
         report = await run_research_task("Is AI in a hype cycle?", websocket, stream_output)

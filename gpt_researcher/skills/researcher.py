@@ -1,11 +1,12 @@
 import asyncio
 import random
+import json
 from typing import Dict, Optional
 
 from ..actions.utils import stream_output
-from ..actions import get_sub_queries, scrape_urls
-from ...document import DocumentLoader, LangChainDocumentLoader
-from ...utils.enum import ReportSource, ReportType, Tone
+from ..actions.query_processing import get_sub_queries
+from ..document import DocumentLoader, LangChainDocumentLoader
+from ..utils.enum import ReportSource, ReportType, Tone
 
 
 class ResearchConductor:
@@ -95,12 +96,12 @@ class ResearchConductor:
                 self.researcher.websocket,
             )
 
-        scraped_sites = scrape_urls(new_search_urls, self.researcher.cfg)
+        scraped_content = await self.researcher.scraper_manager.browse_urls(new_search_urls)
 
         if self.researcher.vector_store:
-            self.researcher.vector_store.load(scraped_sites)
+            self.researcher.vector_store.load(scraped_content)
 
-        return await self.researcher.context_manager.get_similar_content_by_query(self.researcher.query, scraped_sites)
+        return await self.researcher.context_manager.get_similar_content_by_query(self.researcher.query, scraped_content)
 
     async def __get_context_by_vectorstore(self, query, filter: Optional[dict] = None):
         """
@@ -110,7 +111,7 @@ class ResearchConductor:
         """
         context = []
         # Generate Sub-Queries including original query
-        sub_queries = await self.__get_sub_queries(query)
+        sub_queries = await self.get_sub_queries(query)
         # If this is not part of a sub researcher, add original query to research for better results
         if self.researcher.report_type != "subtopic_report":
             sub_queries.append(query)
@@ -142,7 +143,7 @@ class ResearchConductor:
         """
         context = []
         # Generate Sub-Queries including original query
-        sub_queries = await self.__get_sub_queries(query)
+        sub_queries = await self.get_sub_queries(query)
         # If this is not part of a sub researcher, add original query to research for better results
         if self.researcher.report_type != "subtopic_report":
             sub_queries.append(query)
@@ -297,19 +298,24 @@ class ResearchConductor:
             )
 
         # Scrape the new URLs
-        scraped_content_results = await asyncio.to_thread(
-            scrape_urls, new_search_urls, self.researcher.cfg
-        )
+        scraped_content = await self.researcher.scraper_manager.browse_urls(new_search_urls)
 
         if self.researcher.vector_store:
-            self.researcher.vector_store.load(scraped_content_results)
+            self.researcher.vector_store.load(scraped_content)
 
-        return scraped_content_results
+        return scraped_content
 
-    async def __get_sub_queries(self, query):
-        # Generate Sub-Queries including original query
+    async def get_sub_queries(self, query):
+        await stream_output(
+            "logs",
+            "planning_research",
+            f"🌐 Browsing the web and planning research for query: {query}...",
+            self.researcher.websocket,
+        )
+
         return await get_sub_queries(
             query=query,
+            retriever=self.researcher.retrievers[0],
             agent_role_prompt=self.researcher.role,
             cfg=self.researcher.cfg,
             parent_query=self.researcher.parent_query,

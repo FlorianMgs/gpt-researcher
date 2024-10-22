@@ -7,7 +7,7 @@ Current supported LLMs are `openai`, `anthropic`, `azure_openai`, `cohere`, `goo
 Using any model will require updating the `SMART_LLM` and `FAST_LLM` env vars. You might also need to include the LLM provider API Key.
 To learn more about support customization options see [here](/gpt-researcher/config).
 
-**Please note**: GPT Researcher is optimized and heavily tested on GPT models. Some other models might run intro context limit errors, and unexpected responses.
+**Please note**: GPT Researcher is optimized and heavily tested on GPT models. Some other models might run into context limit errors, and unexpected responses.
 Please provide any feedback in our [Discord community](https://discord.gg/DUmbTebB) channel, so we can better improve the experience and performance.
 
 Below you can find examples for how to configure the various supported LLMs.
@@ -53,8 +53,12 @@ EMBEDDING_PROVIDER=azure_openai
 AZURE_OPENAI_API_KEY=[Your Key]
 AZURE_OPENAI_ENDPOINT=https://<your-endpoint>.openai.azure.com/
 OPENAI_API_VERSION=2024-05-01-preview
-FAST_LLM=openai:gpt-4o-mini
-SMART_LLM=openai:gpt-4o
+FAST_LLM=openai:gpt-4o-mini # note that the deplyment name must be the same as the model name
+SMART_LLM=openai:gpt-4o # note that the deplyment name must be the same as the model name
+
+AZURE_EMBEDDING_MODEL=text-embedding-3-small # must be in the same region/resource as the models used
+
+
 ```
 
 
